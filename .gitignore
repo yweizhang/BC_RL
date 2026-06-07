@@ -1,0 +1,14 @@
+.venv/
+local_pydeps/
+__pycache__/
+*.pyc
+
+# Local training outputs
+local_runs/
+*.pth
+*.npz
+*.zip
+events.out.tfevents*
+runs/
+logs/
+eval_outputs/
