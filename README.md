@@ -132,17 +132,6 @@ If you want to retrain from scratch:
 RUN_TRAINING = True
 ```
 
-## How to Run in Colab
-
-Open either notebook in Google Colab.
-
-Install dependencies:
-
-```python
-!pip install -q "stable-baselines3[extra]" gymnasium tensorboard
-```
-
-For the imperfect-BC notebook, run all cells. If using Drive checkpoints, make sure Google Drive is mounted and the output directory exists.
 
 ## Interpretation
 
