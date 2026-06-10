@@ -44,6 +44,25 @@ This experiment is useful for showing:
 - SAC can be used as a more advanced off-policy residual corrector.
 - If BC is already very strong, residual RL may not significantly improve clean-task reward.
 
+### Strong-BC Result
+
+The BC policies already perform well in the nominal environment:
+
+| BC policy | Clean reward |
+|---|---:|
+| Single-step MLP BC | `-128.78 +/- 113.26` |
+| Action-chunk BC | `-128.71 +/- 113.22` |
+
+In a state-dependent disturbed setting, the strong BC baseline degrades, but a small correction is enough to recover much of the loss:
+
+| Method | Clean reward | Disturbed reward |
+|---|---:|---:|
+| Frozen strong BC | `-175.56 +/- 109.31` | `-339.76 +/- 357.50` |
+| Prior compensation only | `-` | `-195.28 +/- 157.01` |
+| Strong BC + PPO residual | `-175.47 +/- 109.40` | `-195.43 +/- 157.87` |
+
+This result illustrates why residual RL is harder to showcase when BC is already strong: the clean-task residual should be close to zero, and the main benefit appears under disturbance or execution shift.
+
 ## Experiment 2: Imperfect BC + Residual RL
 
 Notebook:
@@ -101,49 +120,6 @@ Higher reward is better. This result shows:
 - Observation history and residual smoothing make PPO improve more clearly over weak BC.
 - SAC residual still gives the largest improvement, especially in the disturbed environment.
 - Residual RL is most useful when BC is imperfect or when execution conditions shift.
-
-## Google Drive Checkpoints
-
-The imperfect-BC notebook can save and load checkpoints from Google Drive.
-
-Expected Drive directory:
-
-```text
-/content/drive/MyDrive/imperfect_bc/outputs_imperfect_bc
-```
-
-Typical saved files:
-
-```text
-weak_bc_expert.pth
-ppo_residual_imperfect_bc.zip
-sac_residual_imperfect_bc.zip
-best_ppo_imperfect_bc/best_model.zip
-best_sac_imperfect_bc/best_model.zip
-imperfect_bc_residual_results.npz
-```
-
-If the BC checkpoint already exists and you only want to retrain PPO/SAC:
-
-```python
-RETRAIN_BC = False
-RETRAIN_RL = True
-```
-
-If checkpoints already exist and you only want to re-evaluate:
-
-```python
-RETRAIN_BC = False
-RETRAIN_RL = False
-```
-
-If you want to retrain everything from scratch:
-
-```python
-RETRAIN_BC = True
-RETRAIN_RL = True
-```
-
 
 ## Interpretation
 
