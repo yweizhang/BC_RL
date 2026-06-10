@@ -70,33 +70,36 @@ ACTION_NOISE_STD = 0.01
 
 The goal is not to prove that residual RL always beats a strong BC policy. Instead, the goal is to show that residual RL can improve a frozen, imperfect BC policy under distribution shift or execution bias.
 
-The current tuned setting uses:
+The current history-stack setting uses:
 
 ```python
-RUN_TRAINING = True
+RETRAIN_BC = False
+RETRAIN_RL = True
 PPO_TIMESTEPS = 300_000
 SAC_TIMESTEPS = 250_000
 SAC_BOOTSTRAP_TRANSITIONS = 5_000
+HISTORY_LEN = 3
 RESIDUAL_EPSILON = 0.25
 RESIDUAL_LAMBDA = 0.0005
+RESIDUAL_SMOOTH_LAMBDA = 0.0005
 ```
 
-SAC also warm-starts its replay buffer with expert residual targets before online training.
+The residual policy observes a short history of recent observations, while BC still sees only the current observation. A smoothness penalty is added to discourage jittery residual corrections. SAC also warm-starts its replay buffer with expert residual targets before online training.
 
-## Previous Imperfect-BC Result
+## Imperfect-BC Result
 
-One completed run produced:
+The current history-stack run produced:
 
 | Method | Clean reward | Disturbed reward |
 |---|---:|---:|
-| Weak BC only | `-1313.96 +/- 192.74` | `-1172.45 +/- 339.17` |
-| Weak BC + PPO residual | `-1258.18 +/- 225.90` | `-1101.61 +/- 327.72` |
-| Weak BC + SAC residual | `-743.20 +/- 179.10` | `-453.05 +/- 364.77` |
+| Weak BC only | `-1411.21 +/- 321.06` | `-1358.26 +/- 355.32` |
+| Weak BC + PPO residual | `-1184.68 +/- 179.91` | `-1144.68 +/- 228.94` |
+| Weak BC + SAC residual | `-961.32 +/- 163.13` | `-585.67 +/- 450.55` |
 
 Higher reward is better. This result shows:
 
-- PPO residual gives a modest improvement over weak BC.
-- SAC residual gives a large improvement, especially in the disturbed environment.
+- Observation history and residual smoothing make PPO improve more clearly over weak BC.
+- SAC residual still gives the largest improvement, especially in the disturbed environment.
 - Residual RL is most useful when BC is imperfect or when execution conditions shift.
 
 ## Google Drive Checkpoints
@@ -120,18 +123,38 @@ best_sac_imperfect_bc/best_model.zip
 imperfect_bc_residual_results.npz
 ```
 
+If the BC checkpoint already exists and you only want to retrain PPO/SAC:
+
+```python
+RETRAIN_BC = False
+RETRAIN_RL = True
+```
+
 If checkpoints already exist and you only want to re-evaluate:
 
 ```python
-RUN_TRAINING = False
+RETRAIN_BC = False
+RETRAIN_RL = False
 ```
 
-If you want to retrain from scratch:
+If you want to retrain everything from scratch:
 
 ```python
-RUN_TRAINING = True
+RETRAIN_BC = True
+RETRAIN_RL = True
 ```
 
+## How to Run in Colab
+
+Open either notebook in Google Colab.
+
+Install dependencies:
+
+```python
+!pip install -q "stable-baselines3[extra]" gymnasium tensorboard
+```
+
+For the imperfect-BC notebook, run all cells. If using Drive checkpoints, make sure Google Drive is mounted and the output directory exists.
 
 ## Interpretation
 
